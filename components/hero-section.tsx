@@ -1,8 +1,9 @@
 "use client"
 
-import { Mail, ChevronDown } from "lucide-react"
+import { Mail, ChevronDown, Play } from "lucide-react"
 import { GitHubLogoIcon, LinkedInLogoIcon } from "@radix-ui/react-icons"
 import { TypingEffect } from "./typing-effect"
+import { useRef, useState } from "react"
 
 const skills = ["SQL", "Power BI", "Tableau", "Python", "SSIS", "ETL"]
 
@@ -14,22 +15,42 @@ const floatingTags = [
 ]
 
 export function HeroSection() {
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const [playing, setPlaying] = useState(false)
+
+  const handlePlay = () => {
+    if (videoRef.current) {
+      videoRef.current.play()
+      setPlaying(true)
+    }
+  }
+
   return (
     <section className="relative min-h-screen flex items-center px-4 sm:px-6 lg:px-8 pt-20 overflow-hidden">
       {/* Full screen background video */}
       <video
+        ref={videoRef}
         className="absolute inset-0 w-full h-full object-cover z-0"
-        autoPlay
-        muted
-        loop
         playsInline
         preload="auto"
       >
         <source src="/intro-video.mp4" type="video/mp4" />
       </video>
 
+      {/* Play button overlay */}
+      {!playing && (
+        <div
+          className="absolute inset-0 z-10 flex items-center justify-center cursor-pointer"
+          onClick={handlePlay}
+        >
+          <div className="w-20 h-20 rounded-full bg-white/20 border-2 border-white/50 flex items-center justify-center backdrop-blur-sm hover:bg-white/30 transition-all">
+            <Play className="w-8 h-8 text-white ml-1" />
+          </div>
+        </div>
+      )}
+
       {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black/60 z-10" />
+      <div className="absolute inset-0 bg-black/60 z-10 pointer-events-none" />
 
       {/* Content overlay */}
       <div className="relative z-20 max-w-3xl w-full mx-auto lg:mx-0 lg:ml-16 space-y-6">
