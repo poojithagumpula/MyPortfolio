@@ -1,6 +1,6 @@
 "use client"
 
-import { Mail, ChevronDown, Play } from "lucide-react"
+import { Mail, ChevronDown, Play, Pause } from "lucide-react"
 import { GitHubLogoIcon, LinkedInLogoIcon } from "@radix-ui/react-icons"
 import { TypingEffect } from "./typing-effect"
 import { useRef, useState } from "react"
@@ -18,10 +18,18 @@ export function HeroSection() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [playing, setPlaying] = useState(false)
 
-  const handlePlay = () => {
+  const togglePlay = () => {
     if (videoRef.current) {
-      videoRef.current.play()
-      setPlaying(true)
+      if (playing) {
+        videoRef.current.pause()
+        setPlaying(false)
+      } else {
+        videoRef.current.play().then(() => {
+          setPlaying(true)
+        }).catch(() => {
+          setPlaying(false)
+        })
+      }
     }
   }
 
@@ -37,23 +45,26 @@ export function HeroSection() {
         <source src="/intro-video.mp4" type="video/mp4" />
       </video>
 
-      {/* Play button overlay */}
-      {!playing && (
-        <div
-          className="absolute inset-0 z-10 flex items-center justify-center cursor-pointer"
-          onClick={handlePlay}
-        >
-          <div className="w-20 h-20 rounded-full bg-white/20 border-2 border-white/50 flex items-center justify-center backdrop-blur-sm hover:bg-white/30 transition-all">
+      {/* Dark overlay - click to play/pause */}
+      <div className="absolute inset-0 bg-black/60 z-10" />
+
+      {/* Play/Pause button - center screen */}
+      <button
+        onClick={togglePlay}
+        className="absolute inset-0 z-20 flex items-center justify-center w-full h-full cursor-pointer bg-transparent border-none"
+        aria-label={playing ? "Pause video" : "Play video"}
+      >
+        <div className={`w-20 h-20 rounded-full bg-white/20 border-2 border-white/50 flex items-center justify-center backdrop-blur-sm hover:bg-white/30 transition-all ${playing ? "opacity-0 hover:opacity-100" : "opacity-100"}`}>
+          {playing ? (
+            <Pause className="w-8 h-8 text-white" />
+          ) : (
             <Play className="w-8 h-8 text-white ml-1" />
-          </div>
+          )}
         </div>
-      )}
+      </button>
 
-      {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black/60 z-10 pointer-events-none" />
-
-      {/* Content overlay */}
-      <div className="relative z-20 max-w-3xl w-full mx-auto lg:mx-0 lg:ml-16 space-y-6">
+      {/* Content overlay - pointer events none so clicks go through to button */}
+      <div className="relative z-30 max-w-3xl w-full mx-auto lg:mx-0 lg:ml-16 space-y-6 pointer-events-none">
         {/* Floating Tags */}
         <div className="flex flex-wrap gap-3">
           {floatingTags.map((tag, i) => (
@@ -82,35 +93,5 @@ export function HeroSection() {
           <TypingEffect words={skills} className="text-lg font-mono text-cyan-400" />
         </div>
 
-        {/* Social Links */}
-        <div className="flex gap-4">
-          <a href="mailto:poojithagumpula@gmail.com" className="group p-4 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-500/50 hover:bg-cyan-500/10 transition-all duration-300" aria-label="Email">
-            <Mail className="w-6 h-6 text-slate-400 group-hover:text-cyan-400 transition-colors" />
-          </a>
-          <a href="https://linkedin.com/in/poojagumpula" target="_blank" rel="noopener noreferrer" className="group p-4 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-500/50 hover:bg-cyan-500/10 transition-all duration-300" aria-label="LinkedIn">
-            <LinkedInLogoIcon className="w-6 h-6 text-slate-400 group-hover:text-cyan-400 transition-colors" />
-          </a>
-          <a href="https://github.com/poojithagumpula" target="_blank" rel="noopener noreferrer" className="group p-4 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-500/50 hover:bg-cyan-500/10 transition-all duration-300" aria-label="GitHub">
-            <GitHubLogoIcon className="w-6 h-6 text-slate-400 group-hover:text-cyan-400 transition-colors" />
-          </a>
-        </div>
-
-        {/* CTA Button */}
-        <div className="pt-4">
-          <a href="#projects" className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold text-lg hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 hover:scale-105">
-            View My Work
-            <ChevronDown className="w-5 h-5 animate-bounce" />
-          </a>
-        </div>
-      </div>
-
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-slate-400 z-20">
-        <span className="text-sm">Scroll to explore</span>
-        <div className="w-6 h-10 rounded-full border-2 border-slate-600 flex justify-center pt-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" />
-        </div>
-      </div>
-    </section>
-  )
-}
+        {/* Social Links - pointer events auto so they're clickable */}
+        <div className="flex gap-4 pointer
